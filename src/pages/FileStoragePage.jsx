@@ -659,14 +659,16 @@ function FileStorage() {
                 />
                 Upload Files
               </Button>
-              <Button
-                onClick={() =>
-                  deleteFile({ parentFolder: root, deleteAll: true })
-                }
-                loading={isDeletingFile}
-              >
-                Clear
-              </Button>
+              {import.meta?.env?.DEV && (
+                <Button
+                  onClick={() =>
+                    deleteFile({ parentFolder: root, deleteAll: true })
+                  }
+                  loading={isDeletingFile}
+                >
+                  Clear
+                </Button>
+              )}
             </Box>
           </>
         )}

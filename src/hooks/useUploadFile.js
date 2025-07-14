@@ -8,6 +8,14 @@ export const useUploadFile = () => {
 
   return useMutation({
     mutationFn: async ({ meta, file }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("fileId", newDoc.id);
+      await fetch("https://mpower-host.duckdns.org/upload", {
+        method: "POST",
+        body: formData,
+      });
+
       const newDoc = await addDoc(collection(db, "files"), {
         ...meta,
         dateUploaded: Date.now(),
@@ -16,13 +24,6 @@ export const useUploadFile = () => {
       });
 
       await updateParentFolders(meta.parentFolder, meta.fileSize, 0, true);
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("fileId", newDoc.id);
-      await fetch("https://mpower-host.duckdns.org/upload", {
-        method: "POST",
-        body: formData,
-      });
     },
     onSuccess: (_res, variables) => {
       queryClient.invalidateQueries(["files", variables.parentFolder]);

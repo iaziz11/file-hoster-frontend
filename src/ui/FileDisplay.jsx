@@ -92,11 +92,15 @@ function FileDisplay({
   // upload folder
   const traverseFileTree = async (item, rootInfo, totalFiles, path = "") => {
     if (item.isFile) {
+      console.log(item);
       try {
         const file = await new Promise((resolve) => item.file(resolve));
         await handleFileUpload(file, rootInfo);
       } catch (e) {
-        openToast("error", "There was an problem uploading the file");
+        openToast(
+          "error",
+          "There was an problem uploading the file: " + item.name
+        );
         console.error(e.message);
       }
     } else if (item.isDirectory) {
