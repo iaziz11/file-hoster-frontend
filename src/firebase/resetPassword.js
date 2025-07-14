@@ -4,7 +4,7 @@ import { auth } from "./firebase_init";
 export async function resetPassword(email) {
   try {
     const actionCodeSettings = {
-      url: "http://localhost:5173/login",
+      url: "https://d2oci8gd63g7dj.cloudfront.net/",
       handleCodeInApp: false,
     };
     await sendPasswordResetEmail(auth, email, actionCodeSettings);

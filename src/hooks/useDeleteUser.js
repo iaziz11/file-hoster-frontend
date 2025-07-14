@@ -8,9 +8,12 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId) => {
       if (userId) {
-        const res = await fetch(`http://localhost:3000/deleteUser/${userId}`, {
-          method: "DELETE",
-        });
+        const res = await fetch(
+          `https://mpower-host.duckdns.org/deleteUser/${userId}`,
+          {
+            method: "DELETE",
+          }
+        );
         if (res.status === 500) {
           throw { message: "Problem deleting user" };
         }

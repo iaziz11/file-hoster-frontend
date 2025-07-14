@@ -54,7 +54,9 @@ function PopupTab({
       setActiveFolder(item?.id, item?.type, item?.fileName);
       onClose();
     } else {
-      const res = await fetch(`http://localhost:3000/download/${item.id}`);
+      const res = await fetch(
+        `https://mpower-host.duckdns.org/download/${item.id}`
+      );
       const data = await res.json();
       if (data.url) {
         window.open(data.url, "_blank");
@@ -76,13 +78,16 @@ function PopupTab({
         downloadFiles.forEach((dfile) => {
           reqBody.files.push([dfile.id, dfile.path]);
         });
-        const res = await fetch(`http://localhost:3000/download/folder`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(reqBody),
-        });
+        const res = await fetch(
+          `https://mpower-host.duckdns.org/download/folder`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(reqBody),
+          }
+        );
         const archiveBlob = await res.blob();
         const url = URL.createObjectURL(archiveBlob);
         const link = document.createElement("a");
@@ -98,7 +103,9 @@ function PopupTab({
       }
     } else {
       try {
-        const res = await fetch(`http://localhost:3000/download/${item.id}`);
+        const res = await fetch(
+          `https://mpower-host.duckdns.org/download/${item.id}`
+        );
         const data = await res.json();
         if (data.url) {
           const s3File = await fetch(data.url);

@@ -24,7 +24,7 @@ export const useDeleteFile = () => {
 
         const batchDeletions = querySnapshot.docs.map((docSnap) => {
           const deleteS3Promise = fetch(
-            `http://localhost:3000/delete/${docSnap.id}`,
+            `https://mpower-host.duckdns.org/delete/${docSnap.id}`,
             {
               method: "DELETE",
             }
@@ -51,7 +51,7 @@ export const useDeleteFile = () => {
 
           const batchDeletions = querySnapshot.docs.map((docSnap) => {
             const deleteS3Promise = fetch(
-              `http://localhost:3000/delete/${docSnap.id}`,
+              `https://mpower-host.duckdns.org/delete/${docSnap.id}`,
               {
                 method: "DELETE",
               }
@@ -63,7 +63,7 @@ export const useDeleteFile = () => {
           await Promise.all(batchDeletions);
         } else {
           // if just deleting a file, dont worry about anything else
-          await fetch(`http://localhost:3000/delete/${data.fileId}`, {
+          await fetch(`https://mpower-host.duckdns.org/delete/${data.fileId}`, {
             method: "DELETE",
           });
         }

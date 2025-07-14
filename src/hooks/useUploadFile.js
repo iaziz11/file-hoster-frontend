@@ -19,7 +19,7 @@ export const useUploadFile = () => {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("fileId", newDoc.id);
-      await fetch("http://3.135.22.28:3000/upload", {
+      await fetch("https://mpower-host.duckdns.org/upload", {
         method: "POST",
         body: formData,
       });
