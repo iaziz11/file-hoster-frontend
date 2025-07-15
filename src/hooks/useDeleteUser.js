@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "../firebase/firebase_init";
+import { getAuth } from "firebase/auth";
 
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
@@ -8,10 +9,15 @@ export const useDeleteUser = () => {
   return useMutation({
     mutationFn: async (userId) => {
       if (userId) {
+        const firebaseUser = getAuth().currentUser;
+        const firebaseToken = await firebaseUser.getIdToken();
         const res = await fetch(
           `https://mpower-host.duckdns.org/deleteUser/${userId}`,
           {
             method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${firebaseToken}`,
+            },
           }
         );
         if (res.status === 500) {

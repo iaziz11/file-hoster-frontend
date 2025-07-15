@@ -7,8 +7,9 @@ import {
   getDocs,
   where,
 } from "firebase/firestore";
-import { db } from "../firebase/firebase_init";
 import { updateParentFolders } from "../firebase/updateParentFolders";
+import { db } from "../firebase/firebase_init";
+import { getAuth } from "firebase/auth";
 
 export const useDeleteFile = () => {
   const queryClient = useQueryClient();
@@ -18,6 +19,8 @@ export const useDeleteFile = () => {
     mutationFn: async (data) => {
       // delete all files
       if (data.deleteAll) {
+        const firebaseUser = getAuth().currentUser;
+        const firebaseToken = await firebaseUser.getIdToken();
         const q = query(collection(db, "files"));
 
         const querySnapshot = await getDocs(q);
@@ -27,6 +30,9 @@ export const useDeleteFile = () => {
             `https://mpower-host.duckdns.org/delete/${docSnap.id}`,
             {
               method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${firebaseToken}`,
+              },
             }
           );
           const deletePromise = deleteDoc(doc(db, "files", docSnap.id));
@@ -38,7 +44,8 @@ export const useDeleteFile = () => {
         const fileRef = doc(db, "files", data.fileId);
         await deleteDoc(fileRef);
         await updateParentFolders(data.parentFolder, data.fileSize, 0, false);
-
+        const firebaseUser = getAuth().currentUser;
+        const firebaseToken = await firebaseUser.getIdToken();
         // if deleting a folder, need to delete all files and folders contained in folder
         if (data.type === "folder") {
           const filesRef = collection(db, "files");
@@ -54,6 +61,9 @@ export const useDeleteFile = () => {
               `https://mpower-host.duckdns.org/delete/${docSnap.id}`,
               {
                 method: "DELETE",
+                headers: {
+                  Authorization: `Bearer ${firebaseToken}`,
+                },
               }
             );
             const deletePromise = deleteDoc(doc(db, "files", docSnap.id));
@@ -65,6 +75,9 @@ export const useDeleteFile = () => {
           // if just deleting a file, dont worry about anything else
           await fetch(`https://mpower-host.duckdns.org/delete/${data.fileId}`, {
             method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${firebaseToken}`,
+            },
           });
         }
       } else {

@@ -12,6 +12,7 @@ import {
 import { ToastContext } from "../contexts/ToastContext";
 import { fetchFolder } from "../firebase/fetchFolder";
 import { useContext, useState } from "react";
+import { getAuth } from "firebase/auth";
 import OpenInBrowserIcon from "@mui/icons-material/OpenInBrowser";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import DescriptionIcon from "@mui/icons-material/Description";
@@ -54,8 +55,15 @@ function PopupTab({
       setActiveFolder(item?.id, item?.type, item?.fileName);
       onClose();
     } else {
+      const firebaseUser = getAuth().currentUser;
+      const firebaseToken = await firebaseUser.getIdToken();
       const res = await fetch(
-        `https://mpower-host.duckdns.org/download/${item.id}`
+        `https://mpower-host.duckdns.org/download/${item.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${firebaseToken}`,
+          },
+        }
       );
       const data = await res.json();
       if (data.url) {
@@ -78,12 +86,15 @@ function PopupTab({
         downloadFiles.forEach((dfile) => {
           reqBody.files.push([dfile.id, dfile.path]);
         });
+        const firebaseUser = getAuth().currentUser;
+        const firebaseToken = await firebaseUser.getIdToken();
         const res = await fetch(
           `https://mpower-host.duckdns.org/download/folder`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${firebaseToken}`,
             },
             body: JSON.stringify(reqBody),
           }
@@ -103,8 +114,15 @@ function PopupTab({
       }
     } else {
       try {
+        const firebaseUser = getAuth().currentUser;
+        const firebaseToken = await firebaseUser.getIdToken();
         const res = await fetch(
-          `https://mpower-host.duckdns.org/download/${item.id}`
+          `https://mpower-host.duckdns.org/download/${item.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${firebaseToken}`,
+            },
+          }
         );
         const data = await res.json();
         if (data.url) {
