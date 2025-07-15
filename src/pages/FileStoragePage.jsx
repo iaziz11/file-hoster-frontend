@@ -198,7 +198,7 @@ function FileStorage() {
       }
     } catch (e) {
       console.error(e.message);
-      openToast("error", "There was an error uploading files");
+      openToast("error", "There was an error uploading files: " + e.message);
     }
     event.target.value = null;
   };
@@ -659,7 +659,7 @@ function FileStorage() {
                 />
                 Upload Files
               </Button>
-              {import.meta?.env?.DEV && (
+              {import.meta.env.DEV && (
                 <Button
                   onClick={() =>
                     deleteFile({ parentFolder: root, deleteAll: true })

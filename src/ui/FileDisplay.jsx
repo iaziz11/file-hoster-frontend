@@ -66,7 +66,12 @@ function FileDisplay({
     event.preventDefault();
     setIsDragEnter(false);
     const items = event.dataTransfer.items;
-    openToast("info", `Uploading item${items.length === 1 ? "" : "s"}`, false);
+    openToast(
+      "info",
+      `Uploading item${items.length === 1 ? "" : "s"}`,
+      false,
+      true
+    );
 
     const entries = [];
     for (let i = 0; i < items.length; i++) {
@@ -92,7 +97,6 @@ function FileDisplay({
   // upload folder
   const traverseFileTree = async (item, rootInfo, totalFiles, path = "") => {
     if (item.isFile) {
-      console.log(item);
       try {
         const file = await new Promise((resolve) => item.file(resolve));
         await handleFileUpload(file, rootInfo);
@@ -135,7 +139,7 @@ function FileDisplay({
         }
       } catch (e) {
         console.error(e.message);
-        openToast("error", "There was a uploading the folder");
+        openToast("error", "There was a problem uploading the folder");
       }
     }
   };

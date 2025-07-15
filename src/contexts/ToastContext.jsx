@@ -10,13 +10,18 @@ function ToastProvider({ children }) {
 
   const [isToastOpen, setIsToastOpen] = useState(false);
 
-  const openToast = (variant, message, autoHide = true) => {
-    setActiveToast({ variant, message, autoHide });
+  const openToast = (variant, message, autoHide = true, spinner = false) => {
+    setActiveToast({ variant, message, autoHide, spinner });
     setIsToastOpen(true);
   };
   const closeToast = () => {
     setIsToastOpen(false);
-    setActiveToast({ variant: "", message: "", autoHide: true });
+    setActiveToast({
+      variant: "",
+      message: "",
+      autoHide: true,
+      spinner: false,
+    });
   };
   return (
     <ToastContext.Provider value={{ openToast, closeToast }}>
@@ -24,6 +29,7 @@ function ToastProvider({ children }) {
         variant={activeToast.variant}
         message={activeToast.message}
         autoHide={activeToast.autoHide}
+        spinner={activeToast.spinner}
         open={isToastOpen}
         onClose={closeToast}
       />

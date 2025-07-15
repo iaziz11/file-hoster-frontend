@@ -1,4 +1,4 @@
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase/firebase_init";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateParentFolders } from "../firebase/updateParentFolders";
@@ -8,14 +8,6 @@ export const useUploadFile = () => {
 
   return useMutation({
     mutationFn: async ({ meta, file }) => {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("fileId", newDoc.id);
-      await fetch("https://mpower-host.duckdns.org/upload", {
-        method: "POST",
-        body: formData,
-      });
-
       const newDoc = await addDoc(collection(db, "files"), {
         ...meta,
         dateUploaded: Date.now(),
@@ -23,7 +15,23 @@ export const useUploadFile = () => {
         subitems: 0,
       });
 
-      await updateParentFolders(meta.parentFolder, meta.fileSize, 0, true);
+      try {
+        await updateParentFolders(meta.parentFolder, meta.fileSize, 0, true);
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("fileId", newDoc.id);
+        const res = await fetch("https://mpower-host.duckdns.org/upload", {
+          method: "POST",
+          body: formData,
+        });
+        if (!res.ok) {
+          throw new Error(`Upload failed with status ${res.status}`);
+        }
+      } catch (err) {
+        await deleteDoc(doc(db, "files", newDoc.id));
+        throw err;
+      }
     },
     onSuccess: (_res, variables) => {
       queryClient.invalidateQueries(["files", variables.parentFolder]);

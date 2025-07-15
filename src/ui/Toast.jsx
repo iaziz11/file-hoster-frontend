@@ -1,6 +1,6 @@
-import { Alert, Slide, Snackbar } from "@mui/material";
+import { Alert, CircularProgress, Slide, Snackbar } from "@mui/material";
 
-function Toast({ open, onClose, variant, message, autoHide }) {
+function Toast({ open, onClose, variant, message, autoHide, spinner }) {
   return (
     <Snackbar
       open={open}
@@ -12,9 +12,16 @@ function Toast({ open, onClose, variant, message, autoHide }) {
       <Alert
         severity={variant}
         variant="filled"
-        sx={{ width: "100%" }}
+        sx={{ width: "100%", alignItems: "center" }}
         onClose={onClose}
       >
+        {spinner && (
+          <CircularProgress
+            size={16}
+            thickness={5}
+            sx={{ color: "white", mr: 1 }}
+          />
+        )}
         {message}
       </Alert>
     </Snackbar>
