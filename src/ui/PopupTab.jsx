@@ -55,6 +55,7 @@ function PopupTab({
       setActiveFolder(item?.id, item?.type, item?.fileName);
       onClose();
     } else {
+      const newTab = window.open("", "_blank");
       const firebaseUser = getAuth().currentUser;
       const firebaseToken = await firebaseUser.getIdToken();
       const res = await fetch(
@@ -67,7 +68,9 @@ function PopupTab({
       );
       const data = await res.json();
       if (data.url) {
-        window.open(data.url, "_blank");
+        newTab.location = data.url;
+      } else {
+        newTab.close();
       }
     }
   };
@@ -281,11 +284,14 @@ function PopupTab({
                   <ListItemText>Content Type: {item.contentType}</ListItemText>
                 </ListItem>
               )}
-              <ListItem>
-                <ListItemText sx={{ textTransform: "capitalize" }}>
-                  Permissions: {item.permission}
-                </ListItemText>
-              </ListItem>
+              {loggedInUser.role != "field" &&
+                loggedInUser.role != "Project Manager" && (
+                  <ListItem>
+                    <ListItemText sx={{ textTransform: "capitalize" }}>
+                      Permissions: {item.permission}
+                    </ListItemText>
+                  </ListItem>
+                )}
             </List>
           </Box>
           <Divider

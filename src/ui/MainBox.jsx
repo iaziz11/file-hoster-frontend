@@ -15,10 +15,10 @@ function MainBox({ children, variant }) {
           overflow: "hidden",
           transition: "width 300ms ease-in",
           ...(variant === "narrow"
-            ? { width: "60%" }
+            ? { width: { xs: "90%", md: "60%" } }
             : variant === "narrower"
-            ? { width: "40%" }
-            : { width: "80%" }),
+            ? { width: { xs: "90%", md: "40%" } }
+            : { width: { xs: "90%", md: "80%" } }),
         }}
       >
         {children}

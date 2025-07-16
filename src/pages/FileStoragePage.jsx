@@ -205,6 +205,7 @@ function FileStorage() {
 
   // open delete file confirmation modal
   const handleClickDelete = () => {
+    setIsFilePopupOpen(false);
     setActiveModal("delete_file");
   };
 
@@ -620,10 +621,11 @@ function FileStorage() {
               sx={{
                 width: "100%",
                 display: "flex",
-                flexDirection: "row",
-                gap: 2,
+                flexDirection: { xs: "column", md: "row" },
+                gap: { xs: 1, md: 2 },
                 justifyContent: "center",
                 p: 2,
+                alignItems: "center",
                 borderTop: "1px solid rgba(0, 0, 255, 0.3)",
               }}
             >
