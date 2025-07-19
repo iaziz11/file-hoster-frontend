@@ -20,6 +20,7 @@ import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import DownloadIcon from "@mui/icons-material/Download";
 import FolderIcon from "@mui/icons-material/Folder";
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 
 function PopupTab({
   open,
@@ -27,6 +28,7 @@ function PopupTab({
   onClose,
   setActiveFolder,
   onDelete,
+  onEdit,
   loggedInUser,
 }) {
   const openableFileTypes = [
@@ -163,11 +165,6 @@ function PopupTab({
   }
 
   const isFolder = item?.type === "folder";
-
-  // delete item
-  const handleDelete = () => {
-    onDelete();
-  };
 
   return (
     <Drawer
@@ -314,6 +311,7 @@ function PopupTab({
               justifyContent: "start",
               alignItems: "center",
               margin: "auto",
+              marginBottom: 2,
               paddingTop: 3,
               gap: 2,
             }}
@@ -329,6 +327,14 @@ function PopupTab({
               </Button>
             )}
             <Button
+              onClick={onEdit}
+              fullWidth
+              variant="outlined"
+              endIcon={<EditIcon />}
+            >
+              Edit
+            </Button>
+            <Button
               fullWidth
               variant="contained"
               loading={isDownloading}
@@ -343,7 +349,7 @@ function PopupTab({
                 variant="contained"
                 color="error"
                 endIcon={<DeleteForeverIcon />}
-                onClick={handleDelete}
+                onClick={onDelete}
               >
                 Delete
               </Button>

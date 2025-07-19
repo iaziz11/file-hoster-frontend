@@ -13,10 +13,9 @@ import { useCreateFolder } from "../hooks/useCreateFolder";
 import { ToastContext } from "../contexts/ToastContext";
 import { useUploadFile } from "../hooks/useUploadFile";
 import { useContext, useState } from "react";
-import DescriptionIcon from "@mui/icons-material/Description";
-import FolderIcon from "@mui/icons-material/Folder";
 import ListFileItem from "./ListFileItem";
 import FileItem from "./FileItem";
+import { useEditFolder } from "../hooks/useUpdateFolder";
 
 function FileDisplay({
   displayLoading,
@@ -32,8 +31,18 @@ function FileDisplay({
   const { mutateAsync: uploadFile } = useUploadFile();
 
   const { mutateAsync: createFolder } = useCreateFolder();
+  const { mutateAsync: updateFileName } = useEditFolder();
 
   const { openToast, closeToast } = useContext(ToastContext);
+
+  const handleEditFile = async (fileId, newFileName) => {
+    try {
+      await updateFileName({ folderId: fileId, folderName: newFileName });
+    } catch (e) {
+      console.error(e.message);
+      openToast("error", "Problem updating name");
+    }
+  };
 
   // upload file from drag-and-drop
   const handleFileUpload = async (ufile, rootInfo) => {
@@ -217,24 +226,19 @@ function FileDisplay({
         {variant === "grid" &&
           files.map((file) => (
             <FileItem
+              onEditFileName={handleEditFile}
+              fileId={file.id}
               singleClick={() => handleSingleClick(file)}
               doubleClick={() =>
-                handleDoubleClick(file.id, file.type, file.fileName)
-              }
-              key={file.id}
-              icon={
-                file.type === "folder" ? (
-                  <FolderIcon
-                    fontSize="inherit"
-                    sx={{ color: "rgb(52 118 187)" }}
-                  />
-                ) : (
-                  <DescriptionIcon
-                    fontSize="inherit"
-                    sx={{ color: "rgb(52 118 187)" }}
-                  />
+                handleDoubleClick(
+                  file.id,
+                  file.type,
+                  file.contentType,
+                  file.fileName
                 )
               }
+              key={file.id}
+              fileType={file.type === "folder" ? "folder" : file.contentType}
               text={file.fileName}
             />
           ))}
@@ -244,9 +248,9 @@ function FileDisplay({
               <TableHead>
                 <TableRow>
                   <TableCell
-                    sx={{ width: "5%", padding: "4px 8px" }}
+                    sx={{ width: "8%", padding: "4px 8px" }}
                   ></TableCell>
-                  <TableCell sx={{ width: "55%", padding: "4px 8px" }}>
+                  <TableCell sx={{ width: "52%", padding: "4px 8px" }}>
                     Name
                   </TableCell>
                   <TableCell sx={{ width: "20%", padding: "4px 8px" }}>
@@ -262,15 +266,16 @@ function FileDisplay({
                   <ListFileItem
                     singleClick={() => handleSingleClick(file)}
                     doubleClick={() =>
-                      handleDoubleClick(file.id, file.type, file.fileName)
+                      handleDoubleClick(
+                        file.id,
+                        file.type,
+                        file.contentType,
+                        file.fileName
+                      )
                     }
                     key={file.id}
-                    icon={
-                      file.type === "folder" ? (
-                        <FolderIcon sx={{ color: "rgb(52 118 187)" }} />
-                      ) : (
-                        <DescriptionIcon sx={{ color: "rgb(52 118 187)" }} />
-                      )
+                    fileType={
+                      file.type === "folder" ? "folder" : file.contentType
                     }
                     text={file.fileName}
                     size={file.fileSize}

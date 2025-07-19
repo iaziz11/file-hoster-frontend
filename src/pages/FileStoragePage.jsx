@@ -19,6 +19,7 @@ import {
 import { useChangeUserPrefs } from "../hooks/useChangeUserPreferences";
 import { useFetchRootData } from "../hooks/useFetchRootData";
 import { useCreateFolder } from "../hooks/useCreateFolder";
+import { useEditFolder } from "../hooks/useUpdateFolder";
 import { useContext, useEffect, useState } from "react";
 import { ToastContext } from "../contexts/ToastContext";
 import { useFetchFiles } from "../hooks/useFetchFiles";
@@ -38,6 +39,22 @@ import FileDisplay from "../ui/FileDisplay";
 import PopupTab from "../ui/PopupTab";
 import MainBox from "../ui/MainBox";
 import Navbar from "../ui/Navbar";
+import { getAuth } from "firebase/auth";
+
+const openableFileTypes = [
+  "text/html",
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/svg+xml",
+  "text/plain",
+  "application/json",
+  "application/xml",
+  "text/xml",
+  "audio/mpeg",
+  "video/mp4",
+];
 
 function FileStorage() {
   // state
@@ -106,6 +123,9 @@ function FileStorage() {
     error: changingPreferencesError,
   } = useChangeUserPrefs();
 
+  const { mutateAsync: editFolder, isLoading: isEditingFolder } =
+    useEditFolder();
+
   // context
   const { openToast } = useContext(ToastContext);
 
@@ -113,7 +133,10 @@ function FileStorage() {
 
   // creating a folder
   const handleCreateFolder = async () => {
-    const filteredName = newFolderData.name.replace(/\//g, "");
+    const filteredName = newFolderData.name
+      .replace(/[/\\.]/g, "")
+      .trim()
+      .substring(0, 100);
     await createFolder({
       fileName: filteredName,
       permission: newFolderData.permissions,
@@ -141,13 +164,30 @@ function FileStorage() {
   };
 
   // double click on a file or folder
-  const handleDoubleClick = (id, type, name) => {
-    if (type === "file") {
-      console.log("Double clicked a file");
-      return;
+  const handleDoubleClick = async (id, type, contentType, name) => {
+    console.log(contentType);
+    if (type === "file" && openableFileTypes.includes(contentType)) {
+      const newTab = window.open("", "_blank");
+      const firebaseUser = getAuth().currentUser;
+      const firebaseToken = await firebaseUser.getIdToken();
+      const res = await fetch(
+        `https://mpower-host.duckdns.org/download/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${firebaseToken}`,
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.url) {
+        newTab.location = data.url;
+      } else {
+        newTab.close();
+      }
+    } else if (type === "folder") {
+      setCurrentBreadCrumbs((prev) => [...prev, { bcName: name, bcId: id }]);
+      setRoot(id);
     }
-    setCurrentBreadCrumbs((prev) => [...prev, { bcName: name, bcId: id }]);
-    setRoot(id);
   };
 
   // uploading files
@@ -209,6 +249,49 @@ function FileStorage() {
     setActiveModal("delete_file");
   };
 
+  // open edit folder modal
+  const handleClickEdit = () => {
+    if (activeFile.type === "file") return;
+    setNewFolderData({
+      name: activeFile.fileName,
+      permissions: activeFile.permission,
+    });
+    setIsFilePopupOpen(false);
+    setActiveModal("edit_folder");
+  };
+
+  // click create folder button
+  const handleClickCreateFolder = () => {
+    setNewFolderData({
+      name: "",
+      permissions: "field",
+    });
+    setActiveModal("create_folder");
+  };
+
+  // editing folder
+  const handleEditFolder = async () => {
+    if (activeFile.type === "file") return;
+    const filteredName = newFolderData.name
+      .replace(/[/\\.]/g, "")
+      .trim()
+      .substring(0, 100);
+    try {
+      await editFolder({
+        folderId: activeFile.id,
+        permission: newFolderData.permissions,
+        folderName: filteredName,
+      });
+      openToast("success", "Successfully updated folder");
+      setActiveFile(null);
+      setActiveModal(null);
+      setNewFolderData({ name: "", permissions: "field" });
+    } catch (e) {
+      openToast("error", "There was a problem editing the folder");
+      console.error(e.message);
+    }
+  };
+
   // delete file
   const handleDeleteFile = async () => {
     await deleteFile({
@@ -221,7 +304,6 @@ function FileStorage() {
       console.error(deleteFileError);
       openToast("error", "There was a problem with deletion");
     }
-    setIsFilePopupOpen(false);
     setActiveFile(null);
     setActiveModal(null);
   };
@@ -287,7 +369,7 @@ function FileStorage() {
 
   // change create folder form data
   const handleFormChange = (event) => {
-    if (activeModal === "create_folder") {
+    if (activeModal === "create_folder" || activeModal === "edit_folder") {
       setNewFolderData({
         ...newFolderData,
         [event.target.name]: event.target.value,
@@ -442,9 +524,61 @@ function FileStorage() {
             variant="contained"
             onClick={handleCreateFolder}
             loading={isCreatingFolder}
-            disabled={newFolderData.name.length <= 0}
+            disabled={newFolderData?.name?.length <= 0}
           >
             Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* edit folder modal */}
+      <Dialog
+        open={activeModal === "edit_folder"}
+        onClose={() => setActiveModal(null)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>Edit Folder</DialogTitle>
+
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Folder Name"
+            fullWidth
+            name="name"
+            required
+            variant="outlined"
+            value={newFolderData.name}
+            onChange={handleFormChange}
+          />
+          {loggedInUser?.role !== "field" &&
+            loggedInUser?.role !== "Project Manager" && (
+              <FormControl fullWidth required sx={{ mt: 2 }}>
+                <InputLabel id="select-permission">Permissions</InputLabel>
+                <Select
+                  name="permissions"
+                  labelId="select-permission"
+                  value={newFolderData.permissions}
+                  label="Permissions"
+                  onChange={handleFormChange}
+                >
+                  <MenuItem value={"field"}>Field</MenuItem>
+                  <MenuItem value={"office"}>Office</MenuItem>
+                </Select>
+              </FormControl>
+            )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setActiveModal(null)}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleEditFolder}
+            loading={isEditingFolder}
+            disabled={newFolderData?.name?.length <= 0}
+          >
+            Update
           </Button>
         </DialogActions>
       </Dialog>
@@ -499,6 +633,7 @@ function FileStorage() {
         item={activeFile}
         onClose={() => setIsFilePopupOpen(false)}
         onDelete={handleClickDelete}
+        onEdit={handleClickEdit}
         setActiveFolder={handleDoubleClick}
         loggedInUser={loggedInUser}
       />
@@ -624,7 +759,7 @@ function FileStorage() {
                 flexDirection: { xs: "column", md: "row" },
                 gap: { xs: 1, md: 2 },
                 justifyContent: "center",
-                p: 2,
+                padding: "1rem 0",
                 alignItems: "center",
                 borderTop: "1px solid rgba(0, 0, 255, 0.3)",
               }}
@@ -641,7 +776,7 @@ function FileStorage() {
               <Button
                 variant="outlined"
                 startIcon={<CreateNewFolderIcon />}
-                onClick={() => setActiveModal("create_folder")}
+                onClick={handleClickCreateFolder}
               >
                 Create Folder
               </Button>
