@@ -165,7 +165,6 @@ function FileStorage() {
 
   // double click on a file or folder
   const handleDoubleClick = async (id, type, contentType, name) => {
-    console.log(contentType);
     if (type === "file" && openableFileTypes.includes(contentType)) {
       const newTab = window.open("", "_blank");
       const firebaseUser = getAuth().currentUser;

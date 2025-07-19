@@ -54,7 +54,7 @@ function PopupTab({
   const handleClickOpen = async () => {
     if (!item) return;
     if (item.type === "folder") {
-      setActiveFolder(item?.id, item?.type, item?.fileName);
+      setActiveFolder(item?.id, item?.type, item?.contentType, item?.fileName);
       onClose();
     } else {
       const newTab = window.open("", "_blank");

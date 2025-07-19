@@ -115,7 +115,12 @@ function ListFileItem({
       onClick={handleClickEvents}
     >
       <TableCell
-        sx={{ borderBottom: "none", display: "flex", alignItems: "center" }}
+        sx={{
+          borderBottom: "none",
+          display: "flex",
+          alignItems: "center",
+          marginTop: { xs: "5px", md: 0 },
+        }}
       >
         <Icon fontSize="medium" sx={{ color: "rgb(52 118 187)" }} />
       </TableCell>
