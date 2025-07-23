@@ -251,7 +251,10 @@ function FileStorage() {
   // open edit folder modal
   const handleClickEdit = () => {
     if (activeFile.type === "file") {
-      window.open(`http://localhost:5173/edit/${activeFile.id}`, "_blank");
+      window.open(
+        `https://d2oci8gd63g7dj.cloudfront.net/edit/${activeFile.id}`,
+        "_blank"
+      );
     } else {
       setNewFolderData({
         name: activeFile.fileName,
