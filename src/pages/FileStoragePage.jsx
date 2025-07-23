@@ -250,13 +250,16 @@ function FileStorage() {
 
   // open edit folder modal
   const handleClickEdit = () => {
-    if (activeFile.type === "file") return;
-    setNewFolderData({
-      name: activeFile.fileName,
-      permissions: activeFile.permission,
-    });
-    setIsFilePopupOpen(false);
-    setActiveModal("edit_folder");
+    if (activeFile.type === "file") {
+      window.open(`http://localhost:5173/edit/${activeFile.id}`, "_blank");
+    } else {
+      setNewFolderData({
+        name: activeFile.fileName,
+        permissions: activeFile.permission,
+      });
+      setIsFilePopupOpen(false);
+      setActiveModal("edit_folder");
+    }
   };
 
   // click create folder button

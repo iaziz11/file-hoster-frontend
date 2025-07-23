@@ -48,7 +48,7 @@ function App() {
             <Route path="/emailSent" element={<EmailSentPage />} />
             <Route path="/resetPassword" element={<ResetPasswordEmail />} />
             <Route path="/forbidden" element={<ForbiddenPage />} />
-            <Route path="/test" element={<TestEditPage />} />
+            <Route path="/edit/:fileId" element={<TestEditPage />} />
             <Route path="/*" element={<MissingPage />} />
           </Routes>
         </BrowserRouter>
