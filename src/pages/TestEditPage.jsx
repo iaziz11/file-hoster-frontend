@@ -70,7 +70,7 @@ export default function TestEditPage() {
         <DocumentEditor
           id="docxEditor"
           // TODO: update when deployed
-          documentServerUrl="https://mpower-onlyoffice.duckdns.org"
+          documentServerUrl="https://mpower-onlyoffice.duckdns.org/"
           config={{
             document: {
               fileType: editFile.fileType,
