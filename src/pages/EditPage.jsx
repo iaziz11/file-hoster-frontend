@@ -68,6 +68,7 @@ export default function EditPage() {
       const { file } = await fetchFile(fileId);
       const fileExt = file.fileName.split(".").at(-1);
       console.log(fileTypeGroups[fileExt.toLowerCase()]);
+      console.log(fileExt);
       setEditFile({
         id: fileId,
         fileType: fileExt,
@@ -113,7 +114,7 @@ export default function EditPage() {
                 name: loggedInUser.fullName,
               },
               coEditing: {
-                mode: "strict",
+                mode: "fast",
               },
               callbackUrl: `https://mpower-host.duckdns.org/document/${editFile.id}`,
               permissions: {
