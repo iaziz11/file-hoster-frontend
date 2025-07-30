@@ -67,6 +67,7 @@ export default function EditPage() {
     const fetchFileData = async () => {
       const { file } = await fetchFile(fileId);
       const fileExt = file.fileName.split(".").at(-1);
+      console.log(fileTypeGroups[fileExt.toLowerCase()]);
       setEditFile({
         id: fileId,
         fileType: fileExt,
