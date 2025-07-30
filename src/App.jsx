@@ -11,7 +11,7 @@ import ResetPasswordEmail from "./pages/ResetPasswordEmail";
 import { ToastProvider } from "./contexts/ToastContext";
 import ForbiddenPage from "./pages/ForbiddenPage";
 import MissingPage from "./pages/MissingPage";
-import TestEditPage from "./pages/TestEditPage";
+import EditPage from "./pages/EditPage";
 
 function App() {
   return (
@@ -48,7 +48,7 @@ function App() {
             <Route path="/emailSent" element={<EmailSentPage />} />
             <Route path="/resetPassword" element={<ResetPasswordEmail />} />
             <Route path="/forbidden" element={<ForbiddenPage />} />
-            <Route path="/edit/:fileId" element={<TestEditPage />} />
+            <Route path="/edit/:fileId" element={<EditPage />} />
             <Route path="/*" element={<MissingPage />} />
           </Routes>
         </BrowserRouter>

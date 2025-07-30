@@ -46,9 +46,34 @@ function PopupTab({
     "video/mp4",
   ];
 
+  const editableFileTypes = [
+    // Word Processing
+    "docx",
+    "odt",
+    "txt",
+    "rtf",
+    "html",
+    "htm",
+    "docxf",
+
+    // Spreadsheets
+    "xlsx",
+    "ods",
+    "csv",
+    "xls",
+
+    // Presentations
+    "pptx",
+    "odp",
+    "ppsx",
+    "ppt",
+  ];
+
   const [isDownloading, setIsDownloading] = useState(false);
 
   const { openToast } = useContext(ToastContext);
+
+  const fileType = item?.fileName.split(".").at(-1);
 
   // open file in new tab
   const handleClickOpen = async () => {
@@ -326,14 +351,16 @@ function PopupTab({
                 Open
               </Button>
             )}
-            <Button
-              onClick={onEdit}
-              fullWidth
-              variant="outlined"
-              endIcon={<EditIcon />}
-            >
-              Edit
-            </Button>
+            {editableFileTypes.includes(fileType) && (
+              <Button
+                onClick={onEdit}
+                fullWidth
+                variant="outlined"
+                endIcon={<EditIcon />}
+              >
+                Edit
+              </Button>
+            )}
             <Button
               fullWidth
               variant="contained"

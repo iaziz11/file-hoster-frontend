@@ -25,8 +25,30 @@ function onLoadComponentError(errorCode, errorDescription) {
   }
 }
 
-export default function TestEditPage() {
-  // possible documentTypes: word, cell, slide
+const fileTypeGroups = {
+  // Word Processing
+  docx: "word",
+  odt: "word",
+  txt: "word",
+  rtf: "word",
+  html: "word",
+  htm: "word",
+  docxf: "word",
+
+  // Spreadsheets
+  xlsx: "cell",
+  ods: "cell",
+  csv: "cell",
+  xls: "cell",
+
+  // Presentations
+  pptx: "slide",
+  odp: "slide",
+  ppsx: "slide",
+  ppt: "slide",
+};
+
+export default function EditPage() {
   const { fileId } = useParams();
   const navigate = useNavigate();
   const { user: loggedInUser } = useAuthUser();
@@ -45,7 +67,12 @@ export default function TestEditPage() {
     const fetchFileData = async () => {
       const { file } = await fetchFile(fileId);
       const fileExt = file.fileName.split(".").at(-1);
-      setEditFile({ id: fileId, fileType: fileExt, title: file.fileName });
+      setEditFile({
+        id: fileId,
+        fileType: fileExt,
+        title: file.fileName,
+        documentType: fileTypeGroups[fileExt.toLowerCase()] || "word",
+      });
     };
     const fetchFileUrl = async () => {
       const res = await fetch(
@@ -69,7 +96,6 @@ export default function TestEditPage() {
       <div style={{ height: "90vh", marginTop: "1rem" }}>
         <DocumentEditor
           id="docxEditor"
-          // TODO: update when deployed
           documentServerUrl="https://mpower-onlyoffice.duckdns.org/"
           config={{
             document: {
@@ -78,7 +104,7 @@ export default function TestEditPage() {
               title: editFile.title,
               url: editFileUrl,
             },
-            documentType: "word",
+            documentType: editFile.documentType,
             editorConfig: {
               mode: "edit",
               user: {
