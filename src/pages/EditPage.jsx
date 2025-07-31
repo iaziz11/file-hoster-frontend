@@ -59,6 +59,7 @@ export default function EditPage() {
     fileType: "",
     title: "",
     documentType: "",
+    keyAppend: "",
   });
 
   const [editFileUrl, setEditFileUrl] = useState("");
@@ -74,6 +75,7 @@ export default function EditPage() {
         fileType: fileExt,
         title: file.fileName,
         documentType: fileTypeGroups[fileExt.toLowerCase()] || "word",
+        keyAppend: file.dateUploaded,
       });
     };
     const fetchFileUrl = async () => {
@@ -102,7 +104,7 @@ export default function EditPage() {
           config={{
             document: {
               fileType: editFile.fileType,
-              key: editFile.id,
+              key: editFile.id + editFile.keyAppend,
               title: editFile.title,
               url: editFileUrl,
             },

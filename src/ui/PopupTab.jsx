@@ -283,7 +283,7 @@ function PopupTab({
               </ListItem>
               <ListItem>
                 <ListItemText>
-                  Date {isFolder ? "Created" : "Uploaded"}:{" "}
+                  {isFolder ? "Date Created" : "Last Updated"}:{" "}
                   {new Date(item.dateUploaded).toLocaleString()}
                 </ListItemText>
               </ListItem>
